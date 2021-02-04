@@ -1,89 +1,103 @@
 <template>
-  <v-row justify="center" align="center">
-    <v-col cols="12" sm="8" md="6">
-      <div class="text-center">
-        <logo />
-        <vuetify-logo />
-      </div>
-      <v-card>
-        <v-card-title class="headline">
-          Welcome to the Vuetify + Nuxt.js template
+  <v-row class="mb-12" justify="center">
+    <v-col class="test-center" lg="7">
+      <v-card style="margin-bottom: 10px" elevation="2" @click="redirectTo('transport')">
+        <v-card-title style="background-color: #006a9e; color: white">
+          <v-row>
+            <v-col class="text-left">
+              Transports
+            </v-col>
+            <v-col class="text-right">
+              {{ $store.state.resultTransport }} kg
+            </v-col>
+          </v-row>
         </v-card-title>
-        <v-card-text>
-          <p>Vuetify is a progressive Material Design component framework for Vue.js. It was designed to empower developers to create amazing applications.</p>
-          <p>
-            For more information on Vuetify, check out the <a
-              href="https://vuetifyjs.com"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              documentation
-            </a>.
-          </p>
-          <p>
-            If you have questions, please join the official <a
-              href="https://chat.vuetifyjs.com/"
-              target="_blank"
-              rel="noopener noreferrer"
-              title="chat"
-            >
-              discord
-            </a>.
-          </p>
-          <p>
-            Find a bug? Report it on the github <a
-              href="https://github.com/vuetifyjs/vuetify/issues"
-              target="_blank"
-              rel="noopener noreferrer"
-              title="contribute"
-            >
-              issue board
-            </a>.
-          </p>
-          <p>Thank you for developing with Vuetify and I look forward to bringing more exciting features in the future.</p>
-          <div class="text-xs-right">
-            <em><small>&mdash; John Leider</small></em>
-          </div>
-          <hr class="my-3">
-          <a
-            href="https://nuxtjs.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Nuxt Documentation
-          </a>
-          <br>
-          <a
-            href="https://github.com/nuxt/nuxt.js"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Nuxt GitHub
-          </a>
+        <v-card-text class="text-left">
+          Calcul de votre empreinte carbone anuelle par rapport à vos
+          transports
         </v-card-text>
-        <v-card-actions>
-          <v-spacer />
-          <v-btn
-            color="primary"
-            nuxt
-            to="/inspire"
-          >
-            Continue
-          </v-btn>
-        </v-card-actions>
       </v-card>
+      <v-card style="margin-bottom: 10px" elevation="2" @click="redirectTo('energies')">
+        <v-card-title style="background-color: #dd0061; color: white">
+          <v-row>
+            <v-col class="text-left">
+              Énergies
+            </v-col>
+            <v-col class="text-right">
+              {{ $store.state.resultEnergie }} kg
+            </v-col>
+          </v-row>
+        </v-card-title>
+        <v-card-text class="text-left">
+          Calcul de votre empreinte carbone anuelle par rapport à votre
+          consomation de gaz et d'électricité
+        </v-card-text>
+      </v-card>
+      <v-card style="margin-bottom: 10px" elevation="2" @click="redirectTo('alimentations')">
+        <v-card-title style="background-color: #ff4814; color: white">
+          <v-row>
+            <v-col class="text-left">
+              Alimentations
+            </v-col>
+            <v-col class="text-right">
+              {{ $store.state.resultAlimentation }} kg
+            </v-col>
+          </v-row>
+        </v-card-title>
+        <v-card-text class="text-left">
+          Calcul de votre empreinte carbone anuelle par rapport à votre
+          alimentation
+        </v-card-text>
+      </v-card>
+      <v-card style="margin-bottom: 10px" elevation="2" @click="redirectTo('objetsduquotidien')">
+        <v-card-title style="background-color: #fecd33; color: white">
+          <v-row>
+            <v-col class="text-left">
+              Objets du quotidien
+            </v-col>
+            <v-col class="text-right">
+              {{ $store.state.resultDivers }} kg
+            </v-col>
+          </v-row>
+        </v-card-title>
+        <v-card-text class="text-left">
+          Calcul de votre empreinte carbone anuelle par rapport à vos objets du quotidien
+        </v-card-text>
+      </v-card>
+      <v-btn
+        @click="coucou()"
+      >
+        <v-icon>
+          mdi-delete
+        </v-icon>
+        Effacer
+      </v-btn>
+    </v-col>
+    <v-col lg="5">
+      <FinalPieChart />
     </v-col>
   </v-row>
 </template>
-
 <script>
-import Logo from '~/components/Logo.vue'
-import VuetifyLogo from '~/components/VuetifyLogo.vue'
-
+import FinalPieChart from '@/components/FinalPieChart.js'
 export default {
   components: {
-    Logo,
-    VuetifyLogo
+    FinalPieChart
+  },
+
+  data () {
+    return {
+      scoreEnergie: 0
+    }
+  },
+  methods: {
+    redirectTo (link) {
+      this.$router.push(link)
+    },
+    coucou () {
+      localStorage.clear()
+      window.location.reload()
+    }
   }
 }
 </script>

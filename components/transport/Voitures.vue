@@ -14,7 +14,7 @@
               type="number"
               min="0"
               oninput="validity.valid||(value='');"
-              label="Nombre de kilomètres"
+              label="Nombre de kilomètres / an"
               required
             />
             <v-combobox
@@ -22,7 +22,7 @@
               :items="motorisations"
               item-text="name"
               label="Motorisation"
-              return-object
+              :return-object="false"
               required
               @input="displayPF()"
             />
@@ -39,7 +39,8 @@
           <v-row>
             <v-col class="text-right">
               <v-btn
-                color="primary"
+                color="#006a9e"
+                style="color: white"
                 :disabled="!isValid"
                 @click="calculVoiture()"
               >
@@ -50,7 +51,7 @@
         </div>
       </v-col>
       <v-col>
-        <div class="primary--text fill-height">
+        <div class="fill-height" style="color: #006a9e">
           <v-row class="h-75">
             <v-col class="text-center">
               <h1 class="display-4 font-weight-medium">
@@ -75,13 +76,13 @@ export default {
   data: () => ({
     isValid: true,
     showPF: false,
-    km: '',
+    km: 0,
     idVoiture: '',
     results: undefined,
     resultat: 0,
     puissances: undefined,
     puissance: undefined,
-    motorisation: undefined,
+    motorisation: '',
     motorisations: [
       { name: 'Essence' },
       { name: 'Diesel' },
@@ -133,9 +134,27 @@ export default {
     ]
   }),
 
+  mounted () {
+    if (localStorage.voitureKm) {
+      this.km = localStorage.voitureKm
+    }
+    if (localStorage.motorisation) {
+      this.motorisation = localStorage.motorisation
+      this.displayPF()
+    }
+    if (localStorage.puissance) {
+      this.puissance = JSON.parse(localStorage.puissance)
+    }
+    if (localStorage.voitureResultat) {
+      this.resultat = localStorage.voitureResultat
+      this.fireEvent(this.resultat)
+    }
+  },
+
   methods: {
     async calculVoiture () {
       if (this.puissance !== null) {
+        localStorage.puissance = JSON.stringify(this.puissance)
         this.idVoiture = this.puissance.id
       }
       this.results = await axios.get('https://koumoul.com/s/data-fair/api/v1/datasets/base-carbone(r)/lines?format=json&q=' + this.idVoiture + '&q_mode=simple').then(response => (this.results = response.data.results[0]))
@@ -144,27 +163,35 @@ export default {
       this.fireEvent(this.resultat)
     },
     fireEvent (r) {
+      this.saveToLocal()
       this.$emit('carEvent', r, 'voiture')
+    },
+    saveToLocal () {
+      localStorage.voitureKm = this.km
+      localStorage.voitureResultat = this.resultat
     },
     displayPF () {
       this.puissance = null
       if (this.motorisation !== null) {
-        if (this.motorisation.name === 'Essence') {
+        if (this.motorisation === 'Essence') {
           this.showPF = true
           this.puissances = this.puissances_essence
-        } else if (this.motorisation.name === 'Diesel') {
+        } else if (this.motorisation === 'Diesel') {
           this.showPF = true
           this.puissances = this.puissances_diesel
-        } else if (this.motorisation.name === 'Essence / Diesel') {
+        } else if (this.motorisation === 'Essence / Diesel') {
           this.showPF = true
           this.puissances = this.puissances_mixte
-        } else if (this.motorisation.name === 'Hybride') {
+        } else if (this.motorisation === 'Hybride') {
           this.showPF = false
           this.idVoiture = '28009'
-        } else if (this.motorisation.name === 'Electrique') {
+          localStorage.puissance = null
+        } else if (this.motorisation === 'Electrique') {
           this.showPF = false
           this.idVoiture = '28007'
+          localStorage.puissance = null
         }
+        localStorage.motorisation = this.motorisation
       }
     }
   }

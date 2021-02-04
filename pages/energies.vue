@@ -9,7 +9,7 @@
             :step="n.id"
             :editable="editable"
             :rules="[() => n.check]"
-            color="#006a9e"
+            color="#dd0061"
           >
             {{ n.name }}
           </v-stepper-step>
@@ -20,14 +20,10 @@
       <v-stepper-items>
         <v-stepper-content v-for="n in steps" :key="`${n.id}-content`" :step="n.id">
           <div v-if="n.id === 1">
-            <Voitures @carEvent="getFinal" />
+            <Gaz @gazEvent="getFinal" />
           </div>
           <div v-else-if="n.id === 2">
-            <Avions @planeEvent="getFinal" />
-            <Trains @trainEvent="getFinal" />
-          </div>
-          <div v-else-if="n.id === 3">
-            <TransportsEnCommun @tecEvent="getFinal" />
+            <Elec @elecEvent="getFinal" />
           </div>
           <div v-else>
             <v-card class="mb-12">
@@ -43,9 +39,9 @@
                       class="text-center"
                       style="width: 600px; height:600px; margin-left: auto; margin-right: auto"
                     >
-                      <TransportPieChart :resdata="res" :testprop="trigger" />
+                      <EnergiePieChart :resdata="res" :testprop="trigger" />
                       <v-btn
-                        @click="saveTransport()"
+                        @click="saveEnergie()"
                       >
                         Sauvegarder
                       </v-btn>
@@ -68,49 +64,38 @@
   </v-stepper>
 </template>
 <script>
-import TransportPieChart from '@/components/transport/PieChart/TransportPieChart'
-import Voitures from '@/components/transport/Voitures.vue'
-import Avions from '@/components/transport/Avions.vue'
-import Trains from '@/components/transport/Trains.vue'
-import TransportsEnCommun from '@/components/transport/TransportsEnCommun.vue'
+import EnergiePieChart from '@/components/energies/EnergiePieChart'
+import Gaz from '@/components/energies/gaz.vue'
+import Elec from '@/components/energies/elec.vue'
 export default {
-  name: 'Transport',
+  name: 'Energies',
   components: {
-    TransportPieChart,
-    Voitures,
-    Avions,
-    Trains,
-    TransportsEnCommun
+    Gaz,
+    Elec,
+    EnergiePieChart
   },
   data () {
     return {
       e1: 1,
       finalResult: 0,
       res: {
-        resVoiture: 0,
-        resAvion: 0,
-        resTrain: 0,
-        resTec: 0
+        resGaz: 0,
+        resElec: 0
       },
       steps: [
         {
-          name: 'Voitures',
+          name: 'Gaz',
           id: 1,
           check: true
         },
         {
-          name: 'Avions / Trains',
+          name: 'Électricité',
           id: 2,
           check: true
         },
         {
-          name: 'Transports en commun',
-          id: 3,
-          check: true
-        },
-        {
           name: 'Résultats',
-          id: 4,
+          id: 3,
           check: true
         }
       ],
@@ -128,7 +113,7 @@ export default {
       }
     },
     vertical () {
-      this.e1 = 4
+      this.e1 = 3
     }
   },
 
@@ -145,28 +130,20 @@ export default {
     },
     getFinal (r, name) {
       switch (name) {
-        case 'voiture':
-          this.res.resVoiture = parseInt(r)
+        case 'gaz':
+          this.res.resGaz = parseInt(r)
           // this.data[0].value = this.res.resVoiture
           break
-        case 'avion':
-          this.res.resAvion = parseInt(r)
+        case 'elec':
+          this.res.resElec = parseInt(r)
           // this.data[1].value = this.res.resAvion
           break
-        case 'train':
-          this.res.resTrain = parseInt(r)
-          // this.data[2].value = this.res.resTrain
-          break
-        case 'tec':
-          this.res.resTec = parseInt(r)
-          // this.data[3].value = this.res.resTec
-          break
       }
-      this.finalResult = parseInt(this.res.resVoiture + this.res.resAvion + this.res.resTrain + this.res.resTec)
+      this.finalResult = parseInt(this.res.resGaz + this.res.resElec)
       this.trigger = !this.trigger
     },
-    saveTransport () {
-      this.$store.state.resultTransport = this.finalResult
+    saveEnergie () {
+      this.$store.state.resultEnergie = this.finalResult
       this.$router.push('/')
     }
   }

@@ -9,32 +9,17 @@
           outlined
         >
           <v-text-field
-            v-model="ccHv"
+            v-model="kWh"
             type="number"
             min="0"
             oninput="validity.valid||(value='');"
-            label="Court-courrier - Heures de vol"
-            required
-          />
-          <v-text-field
-            v-model="mcHv"
-            type="number"
-            min="0"
-            oninput="validity.valid||(value='');"
-            label="Moyen-courrier - Heures de vol"
-            required
-          />
-          <v-text-field
-            v-model="lcHv"
-            type="number"
-            min="0"
-            oninput="validity.valid||(value='');"
-            label="Long-courrier - Heures de vol"
+            label="kWh / an"
+            color="#dd0061"
             required
           />
           <v-row>
             <v-col class="text-right">
-              <v-btn color="primary" @click="calculAvion()">
+              <v-btn color="#dd0061" style="color: white" @click="calculElec()">
                 Calcul
               </v-btn>
             </v-col>
@@ -42,7 +27,7 @@
         </div>
       </v-col>
       <v-col>
-        <div class="primary--text fill-height">
+        <div class="fill-height" style="color: #dd0061">
           <v-row class="h-75">
             <v-col class="text-center">
               <h1 class="display-4 font-weight-medium">
@@ -63,20 +48,38 @@
 <script>
 import axios from 'axios'
 export default {
-  name: 'Avions',
+  name: 'Elec',
   data: () => ({
-    ccHv: 0,
-    mcHv: 0,
-    lcHv: 0,
+    kWh: 0,
     resultat: 0,
-    results: undefined
+    results: undefined,
+    id: 15591
   }),
 
+  mounted () {
+    if (localStorage.kWh) {
+      this.kWh = localStorage.kWh
+    }
+    if (localStorage.elecResultat) {
+      this.resultat = localStorage.elecResultat
+      this.fireEvent(this.resultat)
+    }
+  },
+
   methods: {
-    async calculVoiture () {
-      this.results = await axios.get('https://koumoul.com/s/data-fair/api/v1/datasets/base-carbone(r)/lines?format=json&q=' + this.idVoiture + '&q_mode=simple').then(response => (this.results = response.data.results[0]))
+    async calculElec () {
+      this.results = await axios.get('https://koumoul.com/s/data-fair/api/v1/datasets/base-carbone(r)/lines?format=json&q=' + this.id + '&q_mode=simple').then(response => (this.results = response.data.results[0]))
       const co2 = parseFloat(this.results.Total_poste_non_décomposé.replace(',', '.'))
-      this.resultat = (this.km * co2).toFixed(0)
+      this.resultat = (this.kWh * co2).toFixed(0)
+      this.fireEvent(this.resultat)
+    },
+    fireEvent (r) {
+      this.saveToLocal()
+      this.$emit('elecEvent', r, 'elec')
+    },
+    saveToLocal () {
+      localStorage.kWh = this.kWh
+      localStorage.elecResultat = this.resultat
     }
   }
 }

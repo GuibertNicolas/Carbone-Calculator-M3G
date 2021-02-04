@@ -1,17 +1,5 @@
 <template>
-  <v-card class="mb-12">
-    <v-row>
-      <v-col class="text-center">
-        <div
-          label="test"
-          :class="`rounded`"
-          class="pa-4 text-center text-no-wrap outlined"
-          outlined
-        >
-        </div>
-      </v-col>
-    </v-row>
-  </v-card>
+  
 </template>
 <script>
 import axios from 'axios'

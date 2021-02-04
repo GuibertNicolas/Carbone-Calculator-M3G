@@ -9,7 +9,7 @@
             :step="n.id"
             :editable="editable"
             :rules="[() => n.check]"
-            color="#006a9e"
+            color="#fecd33"
           >
             {{ n.name }}
           </v-stepper-step>
@@ -20,14 +20,13 @@
       <v-stepper-items>
         <v-stepper-content v-for="n in steps" :key="`${n.id}-content`" :step="n.id">
           <div v-if="n.id === 1">
-            <Voitures @carEvent="getFinal" />
+            <Vetement @vetEvent="getFinal" />
           </div>
           <div v-else-if="n.id === 2">
-            <Avions @planeEvent="getFinal" />
-            <Trains @trainEvent="getFinal" />
+            <Multimedia @mediaEvent="getFinal" />
           </div>
           <div v-else-if="n.id === 3">
-            <TransportsEnCommun @tecEvent="getFinal" />
+            <Electromenager @menagerEvent="getFinal" />
           </div>
           <div v-else>
             <v-card class="mb-12">
@@ -43,9 +42,9 @@
                       class="text-center"
                       style="width: 600px; height:600px; margin-left: auto; margin-right: auto"
                     >
-                      <TransportPieChart :resdata="res" :testprop="trigger" />
+                      <DiversPieChart :resdata="res" :testprop="trigger" />
                       <v-btn
-                        @click="saveTransport()"
+                        @click="saveAlimentation()"
                       >
                         Sauvegarder
                       </v-btn>
@@ -68,48 +67,45 @@
   </v-stepper>
 </template>
 <script>
-import TransportPieChart from '@/components/transport/PieChart/TransportPieChart'
-import Voitures from '@/components/transport/Voitures.vue'
-import Avions from '@/components/transport/Avions.vue'
-import Trains from '@/components/transport/Trains.vue'
-import TransportsEnCommun from '@/components/transport/TransportsEnCommun.vue'
+import DiversPieChart from '@/components/divers/DiversPieChart'
+import Vetement from '@/components/divers/vetement'
+import Electromenager from '@/components/divers/electromenager'
+import Multimedia from '@/components/divers/multimedia'
 export default {
-  name: 'Transport',
+  name: 'ObjetsDuQuotidien',
   components: {
-    TransportPieChart,
-    Voitures,
-    Avions,
-    Trains,
-    TransportsEnCommun
+    Vetement,
+    Multimedia,
+    Electromenager,
+    DiversPieChart
   },
   data () {
     return {
       e1: 1,
       finalResult: 0,
       res: {
-        resVoiture: 0,
-        resAvion: 0,
-        resTrain: 0,
-        resTec: 0
+        resVet: 0,
+        resMedia: 0,
+        resElectroMenager: 0
       },
       steps: [
         {
-          name: 'Voitures',
+          name: 'Vêtements',
           id: 1,
           check: true
         },
         {
-          name: 'Avions / Trains',
+          name: 'Multimédias',
           id: 2,
           check: true
         },
         {
-          name: 'Transports en commun',
+          name: 'Électroménagers',
           id: 3,
           check: true
         },
         {
-          name: 'Résultats',
+          name: 'Résultat',
           id: 4,
           check: true
         }
@@ -145,28 +141,24 @@ export default {
     },
     getFinal (r, name) {
       switch (name) {
-        case 'voiture':
-          this.res.resVoiture = parseInt(r)
+        case 'vet':
+          this.res.resVet = parseInt(r)
           // this.data[0].value = this.res.resVoiture
           break
-        case 'avion':
-          this.res.resAvion = parseInt(r)
+        case 'media':
+          this.res.resMedia = parseInt(r)
           // this.data[1].value = this.res.resAvion
           break
-        case 'train':
-          this.res.resTrain = parseInt(r)
-          // this.data[2].value = this.res.resTrain
-          break
-        case 'tec':
-          this.res.resTec = parseInt(r)
-          // this.data[3].value = this.res.resTec
+        case 'menager':
+          this.res.resElectroMenager = parseInt(r)
+          // this.data[1].value = this.res.resAvion
           break
       }
-      this.finalResult = parseInt(this.res.resVoiture + this.res.resAvion + this.res.resTrain + this.res.resTec)
+      this.finalResult = parseInt(this.res.resVet + this.res.resMedia + this.res.resElectroMenager)
       this.trigger = !this.trigger
     },
-    saveTransport () {
-      this.$store.state.resultTransport = this.finalResult
+    saveAlimentation () {
+      this.$store.state.resultDivers = this.finalResult
       this.$router.push('/')
     }
   }

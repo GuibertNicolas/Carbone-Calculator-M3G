@@ -13,12 +13,12 @@
             type="number"
             min="0"
             oninput="validity.valid||(value='');"
-            label="TGV - Heures de vol"
+            label="TGV - Heures"
             required
           />
           <v-row>
             <v-col class="text-right">
-              <v-btn color="primary" @click="calculTrain()">
+              <v-btn color="#006a9e" style="color: white" @click="calculTrain()">
                 Calcul
               </v-btn>
             </v-col>
@@ -26,7 +26,7 @@
         </div>
       </v-col>
       <v-col>
-        <div class="primary--text fill-height">
+        <div class="fill-height" style="color: #006a9e">
           <v-row class="h-75">
             <v-col class="text-center">
               <h1 class="display-4 font-weight-medium">
@@ -56,6 +56,16 @@ export default {
     id: 21737
   }),
 
+  mounted () {
+    if (localStorage.tgvH) {
+      this.tgvH = localStorage.tgvH
+    }
+    if (localStorage.trainResultat) {
+      this.resultat = localStorage.trainResultat
+      this.fireEvent(this.resultat)
+    }
+  },
+
   methods: {
     async calculTrain () {
       this.results = await axios.get('https://koumoul.com/s/data-fair/api/v1/datasets/base-carbone(r)/lines?format=json&q=' + this.id + '&q_mode=simple').then(response => (this.results = response.data.results[0]))
@@ -64,7 +74,12 @@ export default {
       this.fireEvent(this.resultat)
     },
     fireEvent (r) {
+      this.saveToLocal()
       this.$emit('trainEvent', r, 'train')
+    },
+    saveToLocal () {
+      localStorage.tgvH = this.tgvH
+      localStorage.trainResultat = this.resultat
     }
   }
 }

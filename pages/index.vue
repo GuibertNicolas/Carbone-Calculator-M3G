@@ -65,7 +65,7 @@
         </v-card-text>
       </v-card>
       <v-btn
-        @click="coucou()"
+        @click="clearValue()"
       >
         <v-icon>
           mdi-delete
@@ -74,12 +74,30 @@
       </v-btn>
     </v-col>
     <v-col lg="5">
-      <FinalPieChart />
+      <div ref="content">
+        <FinalPieChart />
+      </div>
+      <v-card-actions
+        class="justify-center"
+        style="margin-top: 15px"
+      >
+        <v-btn
+          @click="exportPDF()"
+        >
+          <v-icon>
+            mdi-download
+          </v-icon>
+          Mes résultats
+        </v-btn>
+      </v-card-actions>
     </v-col>
   </v-row>
 </template>
 <script>
 import FinalPieChart from '@/components/FinalPieChart.js'
+import pdfMake from 'pdfmake/build/pdfmake.js'
+import pdfFonts from 'pdfmake/build/vfs_fonts.js'
+pdfMake.vfs = pdfFonts.pdfMake.vfs
 export default {
   components: {
     FinalPieChart
@@ -94,9 +112,76 @@ export default {
     redirectTo (link) {
       this.$router.push(link)
     },
-    coucou () {
+    clearValue () {
       localStorage.clear()
       window.location.reload()
+    },
+    exportPDF () {
+      const total = this.$store.state.resultTransport + this.$store.state.resultEnergie + this.$store.state.resultDivers + this.$store.state.resultAlimentation
+      const docDefinition = {
+        footer: {
+          columns: [
+            {
+              text: '© ' + new Date().getFullYear() + ' - mc2i / M3G ',
+              alignment: 'center'
+            }
+          ]
+        },
+        content: [
+          {
+            text: 'Mon bilan carbone en ' + new Date().getFullYear(),
+            alignment: 'center',
+            fontSize: 24
+          },
+          {
+            text: '\n'
+          },
+          {
+            layout: 'lightHorizontalLines',
+            columns: [
+              { width: '*', text: '' },
+              {
+                width: 'auto',
+                table: {
+                  headerRows: 1,
+                  widths: [175, 175],
+                  body: [
+                    ['Catégories', 'Empreinte carbone'],
+                    ['Transports', this.$store.state.resultTransport + ' KgCO2'],
+                    ['Energies', this.$store.state.resultEnergie + ' KgCO2'],
+                    ['Alimentaion', this.$store.state.resultAlimentation + ' KgCO2'],
+                    ['Objets du quotidien', this.$store.state.resultDivers + ' KgCO2'],
+                    [{ text: 'Total', bold: true },
+                      {
+                        text: total + ' KgCO2',
+                        bold: true
+                      }
+                    ]
+                  ]
+                }
+              },
+              { width: '*', text: '' }
+            ]
+          }
+        ]
+      }
+      const moyenne = 11000
+      if (total > moyenne) {
+        docDefinition.content.push({
+          text: '\nMon empreinte carbone est supérieure de ' + parseInt((total - moyenne) / 1000) + ' tonnes à la moyenne française*'
+        })
+      } else {
+        docDefinition.content.push({
+          text: '\nMon empreinte carbone est inférieure de ' + parseInt((moyenne - total) / 1000) + ' tonnes à la moyenne française*'
+        })
+      }
+      docDefinition.content.push({
+        text: '\n\n\n(*) Selon le ministère de la transition écologique, l’empreinte carbone des Français représente ' + parseInt(moyenne / 1000) + ' tonnes de CO2 par an en 2018',
+        fontSize: 7,
+        color: '#707070'
+      })
+      const pdf = pdfMake.createPdf(docDefinition)
+      pdf.download('M3G-Résultats.pdf')
     }
   }
 }

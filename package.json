@@ -18,10 +18,13 @@
     "chartjs-plugin-datalabels": "^0.7.0",
     "chartjs-plugin-labels": "^1.1.0",
     "core-js": "^3.8.0",
+    "jspdf": "^2.3.0",
     "nuxt": "^2.14.9",
+    "pdfmake": "^0.1.70",
     "vue-axios": "^3.2.0",
     "vue-chartjs": "^3.5.1",
-    "vue-chartless": "^0.1.23"
+    "vue-chartless": "^0.1.23",
+    "vue-pdf": "^4.2.0"
   },
   "devDependencies": {
     "@nuxtjs/eslint-config": "^3.1.0",
@@ -34,6 +37,7 @@
     "eslint": "^7.14.0",
     "eslint-plugin-nuxt": "^1.0.0",
     "jest": "^26.5.0",
+    "nuxt-pdf": "^1.4.1",
     "vue-jest": "^3.0.4"
   }
 }
